@@ -8,7 +8,7 @@ export const CharacterSchema = z.object({
   ability: z.string().nullable(),
   minimal_distance: z.number().nullable(),
   weight: z.number().nullable(),
-  born: z.date(),
+  born: z.string(),
   in_space_since: z.date().nullable(),
   beer_consumption: z.number().nullable(),
   knows_the_answer: z.boolean().nullable()
