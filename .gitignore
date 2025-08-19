@@ -27,8 +27,3 @@ coverage/
 # Knex
 migrations/*.js
 seeds/*.js
-
-# Node package locks
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
