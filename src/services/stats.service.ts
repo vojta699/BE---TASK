@@ -1,6 +1,7 @@
 import db from '../db/knex';
 import { normalizeGender } from './character.service';
 
+// Helper to calculate full years between two dates
 function yearsBetween(from: Date, to = new Date()): number {
   const diff = to.getTime() - from.getTime();
   const msPerYear = 365.2425 * 24 * 60 * 60 * 1000;
@@ -9,14 +10,15 @@ function yearsBetween(from: Date, to = new Date()): number {
 
 export const StatsService = {
   async compute() {
+    // Fetch characters, nemeses, and average weight in parallel
     const [characters, nemeses, weightRow] = await Promise.all([
       db('character').select('id', 'born', 'gender'),
       db('nemesis').select('id', 'years'),
       db('character').avg<{ avg: string }>('weight as avg').first()
     ]);
-
+    // Count total characters
     const characters_count = characters.length;
-
+    // Aggregate genders (normalize to 'male', 'female', 'other')
     const genders = characters.reduce(
       (acc, c) => {
         const g = normalizeGender(c.gender);
@@ -25,14 +27,14 @@ export const StatsService = {
       },
       { male: 0, female: 0, other: 0 }
     );
-
+    // Calculate ages for characters and nemeses
     const charAges = characters
       .filter(c => c.born)
       .map(c => new Date().getFullYear() - new Date(c.born).getFullYear());
     const nemAges = nemeses
       .filter((n: any) => n.years)
       .map((n: any) => yearsBetween(new Date(n.years)));
-
+    // Helper to compute average
     const avg = (arr: number[]) => (arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0);
 
     return {
