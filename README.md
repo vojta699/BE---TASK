@@ -1,8 +1,8 @@
 # Characters API (Express + Postgres + Knex)
 
-REST API that exposes:
+## REST API that exposes:
 
-- `GET /api/characters` – returns characters with nested nemeses and their secrets (tree structure)
+- `GET /api/characters` – returns ten characters with nested nemeses and their secrets (tree structure), also querry params can be provided to edit number of result (max 10 result per page) `GET /api/characters?page=1&pageSize=5`
 - `GET /api/stats` – returns statistics JSON: characters_count, average_age (characters+nemeses), average_weight, genders
 - `GET /api/health` – health check
 
@@ -10,10 +10,8 @@ REST API that exposes:
 
 1. Copy `.env.example` to `.env` and set `DATABASE_URL` (Postgres URL). For copying you can use script: `npm run setup:env`
 2. Install deps: `npm i`
-3. Run migrations: `npm run migrate:latest`
-4. Seed sample data: `npm run seed`
-5. Start dev server: `npm run dev`
-6. To run tests: `npm run test`
+3. Start dev server: `npm run dev`
+4. To run tests: `npm run test` or `npm run test:coverage`
 
 ## App structure
 
@@ -36,10 +34,7 @@ characters-api/
 │  ├─ controllers/
 │  ├─ routes/
 │  └─ middleware/
-└─ db/
-   ├─ migrations/
-   └─ seeds/
+└─ tests/
 
 ## Notes
-- DB constraints and indexes are provided.
 - DAO/Service/Controller layering keeps concerns separate and testable.

@@ -1,5 +1,5 @@
 import db from '../db/knex';
-import { CharacterDAO } from '../dao/character.dao';
+import { normalizeGender } from './character.service';
 
 function yearsBetween(from: Date, to = new Date()): number {
   const diff = to.getTime() - from.getTime();
@@ -11,19 +11,27 @@ export const StatsService = {
   async compute() {
     const [characters, nemeses, weightRow] = await Promise.all([
       db('character').select('id', 'born', 'gender'),
-      db('nemesis').select('id', 'born'),
+      db('nemesis').select('id', 'years'),
       db('character').avg<{ avg: string }>('weight as avg').first()
     ]);
 
     const characters_count = characters.length;
-    const genders = (await CharacterDAO.genderCounts());
+
+    const genders = characters.reduce(
+      (acc, c) => {
+        const g = normalizeGender(c.gender);
+        acc[g] = (acc[g] || 0) + 1;
+        return acc;
+      },
+      { male: 0, female: 0, other: 0 }
+    );
 
     const charAges = characters
-      .filter((c: any) => c.born)
-      .map((c: any) => yearsBetween(new Date(c.born)));
+      .filter(c => c.born)
+      .map(c => new Date().getFullYear() - new Date(c.born).getFullYear());
     const nemAges = nemeses
-      .filter((n: any) => n.born)
-      .map((n: any) => yearsBetween(new Date(n.born)));
+      .filter((n: any) => n.years)
+      .map((n: any) => yearsBetween(new Date(n.years)));
 
     const avg = (arr: number[]) => (arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0);
 
